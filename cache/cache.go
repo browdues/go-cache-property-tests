@@ -56,7 +56,8 @@ func NewWithConfig(config Config) *Cache {
 	return cache
 }
 
-// Set adds a key-value pair to the cache with optional expiration
+// Set adds a key-value pair to the cache with optional expiration.
+// If both duration and DefaultTTL are zero, the item will never expire.
 func (c *Cache) Set(key string, value any, duration time.Duration) {
 	var exp int64
 	if duration > 0 {
@@ -66,6 +67,7 @@ func (c *Cache) Set(key string, value any, duration time.Duration) {
 	}
 
 	c.lock.Lock()
+	defer c.lock.Unlock()
 	if elem, exists := c.keyMap[key]; exists {
 		c.lru.Remove(elem)
 		delete(c.keyMap, key)
@@ -81,7 +83,6 @@ func (c *Cache) Set(key string, value any, duration time.Duration) {
 			c.items.Delete(evictKey)
 		}
 	}
-	c.lock.Unlock()
 
 	c.items.Store(key, Item{
 		Value:      value,
@@ -123,11 +124,12 @@ func (c *Cache) Get(key string) (any, bool) {
 // Delete removes a key from the cache
 func (c *Cache) Delete(key string) {
 	c.lock.Lock()
+	defer c.lock.Unlock()
+
 	if elem, exists := c.keyMap[key]; exists {
 		c.lru.Remove(elem)
 		delete(c.keyMap, key)
 	}
-	c.lock.Unlock()
 
 	c.items.Delete(key)
 }
@@ -135,9 +137,10 @@ func (c *Cache) Delete(key string) {
 // Clear removes all items from the cache
 func (c *Cache) Clear() {
 	c.lock.Lock()
+	defer c.lock.Unlock()
+
 	c.lru = list.New()
 	c.keyMap = make(map[string]*list.Element)
-	c.lock.Unlock()
 
 	c.items = sync.Map{}
 }
@@ -146,6 +149,7 @@ func (c *Cache) Clear() {
 func (c *Cache) Len() int {
 	c.lock.Lock()
 	defer c.lock.Unlock()
+
 	return c.lru.Len()
 }
 
