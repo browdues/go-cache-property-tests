@@ -1,6 +1,6 @@
 # Property Testing Example
 
-This repository demonstrates property-based testing in Go using a simple cache implementation. It accompanies the article [Property Testing: Finding Bugs You Didn't Know You Had](link).
+This repository demonstrates property-based testing in Go using a simple cache implementation. It accompanies the article [Property Testing: Finding Bugs You Didn't Know You Had](https://blog.platform.engineering/property-testing-finding-bugs-you-didnt-know-you-had-60bd4b5bc74c).
 
 ## What's Inside
 
@@ -41,5 +41,5 @@ go test -run Property ./... -v
 
 ## Learn More
 
-- Read the accompanying [article](link)
+- Read the accompanying [article](https://blog.platform.engineering/property-testing-finding-bugs-you-didnt-know-you-had-60bd4b5bc74c)
 - Check out the [rapid testing framework](https://pkg.go.dev/pgregory.net/rapid)
